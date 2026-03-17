@@ -43,6 +43,7 @@ export const referentielSchema = z.object({
 });
 
 export const ticketFiltersSchema = z.object({
+  q: z.string().trim().max(100).optional().default(""), // <-- MODIFICATION ICI
   idStatut: optionalPositiveIntFromQuery(),
   idPriorite: optionalPositiveIntFromQuery(),
   idCreateur: optionalPositiveIntFromQuery(),
