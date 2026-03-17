@@ -18,7 +18,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const filters = parsedFilters.data;
 
     const where = {
-      ...(filters.q
+      ...(filters.q // <------------------------------------------------------ MODIFICATION ICI
         ? {
             OR: [
               { titre: { contains: filters.q } },

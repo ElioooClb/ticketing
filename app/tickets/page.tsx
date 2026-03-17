@@ -20,7 +20,7 @@ export default async function TicketsPage({ searchParams }: PageProps): Promise<
   const filters: z.infer<typeof ticketFiltersSchema> = parsed.success
   ? parsed.data
   : {
-      q: "",
+      q: "", // <------------------------------------------------------ MODIFICATION ICI 
       idStatut: undefined,
       idPriorite: undefined,
       idCreateur: undefined,
@@ -29,7 +29,7 @@ export default async function TicketsPage({ searchParams }: PageProps): Promise<
     };
 
   const ticketWhere = {
-  ...(filters.q
+  ...(filters.q                    // <------------------------------------------------------ MODIFICATION ICI
     ? {
         OR: [
           { titre: { contains: filters.q } },
@@ -88,11 +88,11 @@ export default async function TicketsPage({ searchParams }: PageProps): Promise<
         </Link>
       </div>
 
-      <form className="grid grid-cols-1 gap-3 rounded-lg border bg-white p-4 md:grid-cols-6">
+      <form className="grid grid-cols-1 gap-3 rounded-lg border bg-white p-4 md:grid-cols-6"> 
         <input
         type="text"
         name="q"
-        placeholder="Rechercher par mot-clé..."
+        placeholder="Rechercher par mot-clé..." // <------------------------------------------------------ MODIFICATION ICI
         defaultValue={flatParams.q?.toString() ?? ""}
         className="rounded-md border px-3 py-2"
         />
@@ -163,7 +163,7 @@ export default async function TicketsPage({ searchParams }: PageProps): Promise<
           </thead>
           <tbody>
             {tickets.length === 0 ? (
-              <tr>
+              <tr> 
                 <td colSpan={6} className="px-3 py-6 text-center text-gray-500">
                   Aucun ticket trouvé pour cette recherche avec ces filtres.
                 </td>
