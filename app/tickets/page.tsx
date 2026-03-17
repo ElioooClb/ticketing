@@ -18,26 +18,35 @@ export default async function TicketsPage({ searchParams }: PageProps): Promise<
 
   const parsed = ticketFiltersSchema.safeParse(flatParams);
   const filters: z.infer<typeof ticketFiltersSchema> = parsed.success
-    ? parsed.data
-    : {
-        idStatut: undefined,
-        idPriorite: undefined,
-        idCreateur: undefined,
-        clos: "all",
-        tri: "recent",
-      };
+  ? parsed.data
+  : {
+      q: "",
+      idStatut: undefined,
+      idPriorite: undefined,
+      idCreateur: undefined,
+      clos: "all",
+      tri: "recent",
+    };
 
   const ticketWhere = {
-    ...(filters.idStatut ? { idStatut: filters.idStatut } : {}),
-    ...(filters.idPriorite ? { idPriorite: filters.idPriorite } : {}),
-    ...(user.role === "admin"
-      ? filters.idCreateur
-        ? { idCreateur: filters.idCreateur }
-        : {}
-      : { idCreateur: user.idUtilisateur }),
-    ...(filters.clos === "open" ? { dateCloture: null } : {}),
-    ...(filters.clos === "closed" ? { NOT: { dateCloture: null } } : {}),
-  };
+  ...(filters.q
+    ? {
+        OR: [
+          { titre: { contains: filters.q } },
+          { description: { contains: filters.q } },
+        ],
+      }
+    : {}),
+  ...(filters.idStatut ? { idStatut: filters.idStatut } : {}),
+  ...(filters.idPriorite ? { idPriorite: filters.idPriorite } : {}),
+  ...(user.role === "admin"
+    ? filters.idCreateur
+      ? { idCreateur: filters.idCreateur }
+      : {}
+    : { idCreateur: user.idUtilisateur }),
+  ...(filters.clos === "open" ? { dateCloture: null } : {}),
+  ...(filters.clos === "closed" ? { NOT: { dateCloture: null } } : {}),
+};
 
   const [statuts, priorites, utilisateurs, tickets] = await Promise.all([
     prisma.statut.findMany({ orderBy: { idStatut: "asc" } }),
@@ -79,7 +88,14 @@ export default async function TicketsPage({ searchParams }: PageProps): Promise<
         </Link>
       </div>
 
-      <form className="grid grid-cols-1 gap-3 rounded-lg border bg-white p-4 md:grid-cols-5">
+      <form className="grid grid-cols-1 gap-3 rounded-lg border bg-white p-4 md:grid-cols-6">
+        <input
+        type="text"
+        name="q"
+        placeholder="Rechercher par mot-clé..."
+        defaultValue={flatParams.q?.toString() ?? ""}
+        className="rounded-md border px-3 py-2"
+        />
         <select name="idStatut" defaultValue={flatParams.idStatut?.toString() ?? ""} className="rounded-md border px-2 py-2">
           <option value="">Tous statuts</option>
           {statuts.map((statut) => (
@@ -149,7 +165,7 @@ export default async function TicketsPage({ searchParams }: PageProps): Promise<
             {tickets.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-3 py-6 text-center text-gray-500">
-                  Aucun ticket trouvé avec ces filtres.
+                  Aucun ticket trouvé pour cette recherche avec ces filtres.
                 </td>
               </tr>
             ) : (
