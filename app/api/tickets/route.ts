@@ -18,16 +18,24 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     const filters = parsedFilters.data;
 
     const where = {
-      ...(filters.idStatut ? { idStatut: filters.idStatut } : {}),
-      ...(filters.idPriorite ? { idPriorite: filters.idPriorite } : {}),
-      ...(user.role === "admin"
-        ? filters.idCreateur
-          ? { idCreateur: filters.idCreateur }
-          : {}
-        : { idCreateur: user.idUtilisateur }),
-      ...(filters.clos === "open" ? { dateCloture: null } : {}),
-      ...(filters.clos === "closed" ? { NOT: { dateCloture: null } } : {}),
-    };
+      ...(filters.q
+        ? {
+            OR: [
+              { titre: { contains: filters.q } },
+              { description: { contains: filters.q } },
+            ],
+        }
+      : {}),
+    ...(filters.idStatut ? { idStatut: filters.idStatut } : {}),
+    ...(filters.idPriorite ? { idPriorite: filters.idPriorite } : {}),
+    ...(user.role === "admin"
+      ? filters.idCreateur
+        ? { idCreateur: filters.idCreateur }
+        : {}
+      : { idCreateur: user.idUtilisateur }),
+    ...(filters.clos === "open" ? { dateCloture: null } : {}),
+    ...(filters.clos === "closed" ? { NOT: { dateCloture: null } } : {}),
+  };
 
     const orderBy =
       filters.tri === "oldest"
