@@ -9,7 +9,7 @@ export async function POST(): Promise<NextResponse> {
     value: "",
     httpOnly: true,
     sameSite: "lax",
-    secure: process.env.NODE_ENV === "production",
+    secure: process.env.SESSION_COOKIE_SECURE === "true",
     maxAge: 0,
     path: "/",
   });

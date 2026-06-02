@@ -49,7 +49,7 @@ export async function POST(request: Request): Promise<NextResponse> {
       value: token,
       httpOnly: true,
       sameSite: "lax",
-      secure: process.env.NODE_ENV === "production",
+      secure: process.env.SESSION_COOKIE_SECURE === "true",
       maxAge: SESSION_DURATION_SECONDS,
       path: "/",
     });
